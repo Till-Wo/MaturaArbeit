@@ -17,10 +17,12 @@ class Network(nn.Module):
     def __init__(self, n_inputs, n_outputs):
         super(Network, self).__init__()
         self.nn = nn.Sequential(
-            nn.Linear(n_inputs, 32),
-            nn.ReLU(),
-            nn.Linear(32, n_outputs),
-            nn.Softmax(dim=1)
+            nn.Linear(n_inputs, 64),
+            nn.Tanh(),
+            nn.Linear(64, 64),
+            nn.Tanh(),
+            nn.Linear(64, n_outputs),
+            nn.Softmax(dim=-1)
         )
 
     def forward(self, x):

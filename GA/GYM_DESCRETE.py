@@ -9,8 +9,8 @@ MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
 N_PARENTS = 10
 GOAL_REWARD = 199
-ENV_NAME = "LunarLanderContinuous-v2"
-IS_CONTINIOUS = True
+ENV_NAME = "CartPole-v0"
+IS_CONTINIOUS = False
 
 
 class Network(nn.Module):

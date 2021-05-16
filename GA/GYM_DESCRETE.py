@@ -1,4 +1,4 @@
-import gym
+import gym, csv
 import copy
 import numpy as np
 import torch
@@ -9,6 +9,8 @@ MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
 N_PARENTS = 10
 GOAL_REWARD = 199
+ENV_NAME = "LunarLanderContinuous-v2"
+IS_CONTINIOUS = True
 
 
 class Network(nn.Module):
@@ -25,14 +27,20 @@ class Network(nn.Module):
         return self.nn(x)
 
 
-def fitness_function(env, nn):
+def fitness_function(env, nn, device):
     obs = env.reset()
     total_reward = 0.0
     while True:
-        obs_v = torch.FloatTensor([obs])
+        obs_v = torch.FloatTensor([obs]).to(device)
         act_prob = nn(obs_v)
-        acts = act_prob.max(dim=1)[1]
-        obs, reward, done, _ = env.step(acts.data.numpy()[0])
+        if IS_CONTINIOUS:
+            action = torch.tanh(act_prob)
+            action = action.cpu().detach().numpy()[0]
+            action = action.clip(env.action_space.low[0], env.action_space.high[0])
+            obs, reward, done, _ = env.step(action)
+        else:
+            acts = act_prob.max(dim=1)[1]
+            obs, reward, done, _ = env.step(acts.data.numpy()[0])
         total_reward += reward
         if done:
             break
@@ -46,49 +54,49 @@ def mutate(nn):
     return child
 
 
-def main_loop(name="CartPole-v0", excel_add="", net_add="", path=""):
+def main_loop(path="Data/CartPole-v0"):
+    device = torch.device("cpu")
+    with open(path + "-params.csv", "w") as csv_file:
+        writer = csv.writer(csv_file, delimiter="\t")
+        writer.writerow(["MUTATION_STRENGTH", "POPULATION_SIZE", "N_PARENTS", "GOAL_REWARD"])
+        writer.writerow([MUTATION_STRENGTH, POPULATION_SIZE, N_PARENTS, GOAL_REWARD])
+
     Timer = TCF.TimeIt()
-    Writer = TCF.Writer(path + name + excel_add)
 
-    env = gym.make(name)
+    env = gym.make(ENV_NAME)
     gen_counter = 0
-    population = [[Network(env.observation_space.shape[0], env.action_space.n), 0] for _ in range(POPULATION_SIZE)]
+    if IS_CONTINIOUS:
+        population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]).to(device), 0] for _ in
+                      range(POPULATION_SIZE)]
+    else:
+        population = [[Network(env.observation_space.shape[0], env.action_space.n).to(device), 0] for _ in range(POPULATION_SIZE)]
     for individual in population:
-        individual[1] = fitness_function(env, individual[0])
+        individual[1] = fitness_function(env, individual[0], device)
 
+    # ----------------Training Loop--------------------------------------------------------
+    with open(path + ".csv", "w") as csv_file:
+        writer = csv.writer(csv_file, delimiter="\t")
+        writer.writerow(["reward_max", "reward_mean", "time"])
+        while True:
+            population.sort(key=lambda p: p[1], reverse=True)
+            rewards = [p[1] for p in population[:N_PARENTS]]
 
-    while True:
-        population.sort(key=lambda p: p[1], reverse=True)
-        rewards = [p[1] for p in population[:N_PARENTS]]
+            avg_reward = np.mean(rewards)
+            max_reward = np.max(rewards)
+            writer.writerow([max_reward, avg_reward, Timer.update_and_reset()])
+            print(f"gen: {gen_counter} | max_reward: {max_reward} | avg_reward: {avg_reward}")
 
-        avg_reward = np.mean(rewards)
-        max_reward = np.max(rewards)
-        Writer.save(str(gen_counter), "reward_max", max_reward)
-        Writer.save(str(gen_counter), "reward_mean", avg_reward)
-        Writer.save(str(gen_counter), "time", Timer.update_and_reset())
-        print(f"gen: {gen_counter} | max_reward: {max_reward} | avg_reward: {avg_reward}")
+            if avg_reward > 199:
+                torch.save(population[-1][0], f"{path}.pth")
+                break
 
-
-
-
-        if avg_reward > 199:
-            torch.save(population[-1][0], f"Saved_Nets/{name+net_add}.pth")
-            Writer.save(str(0), "MUTATION_STRENGTH", MUTATION_STRENGTH)
-            Writer.save(str(0), "POPULATION_SIZE", POPULATION_SIZE)
-            Writer.save(str(0), "N_PARENTS", N_PARENTS)
-            Writer.save(str(0), "total time since start", Timer.time_since_start())
-            Writer.close()
-            break
-
-
-
-        # TODO Other algorithms
-        prev_population = population
-        population = [population[0]]
-        for _ in range(POPULATION_SIZE-1):
-            parent_idx = np.random.randint(0, N_PARENTS)
-            parent = prev_population[parent_idx][0]
-            child = mutate(parent)
-            fitness = fitness_function(env, child)
-            population.append((child, fitness))
-        gen_counter += 1
+            # TODO Other algorithms
+            prev_population = population
+            population = [population[0]]
+            for _ in range(POPULATION_SIZE - 1):
+                parent_idx = np.random.randint(0, N_PARENTS)
+                parent = prev_population[parent_idx][0]
+                child = mutate(parent)
+                fitness = fitness_function(env, child, device)
+                population.append((child, fitness))
+            gen_counter += 1

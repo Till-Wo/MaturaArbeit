@@ -1,5 +1,5 @@
 
-import xlsxwriter, time
+import time
 
 
 def print_value(name, value):
@@ -7,30 +7,6 @@ def print_value(name, value):
     for _ in range(19 - len(name)):
         space += " "
     print(f"{name}:{space}{value}")
-
-
-class Writer:
-    def __init__(self, name, worksheetname=None):
-        self.row_names = {}
-        self.column_names = {}
-        self.workbook = xlsxwriter.Workbook(f"Data\\{name}.xlsx")
-        if worksheetname is not None:
-            self.worksheet = self.workbook.add_worksheet(worksheetname)
-        else:
-            self.worksheet = self.workbook.add_worksheet()
-
-
-    def save(self, row_key: str, column_key: str, data):
-        if not row_key in self.row_names:
-            self.row_names[row_key] = len(self.row_names)+1
-            self.worksheet.write(self.row_names[row_key], 0, row_key)
-        if not column_key in self.column_names:
-            self.column_names[column_key] = len(self.column_names)+1
-            self.worksheet.write(0, self.column_names[column_key], column_key)
-
-        self.worksheet.write(self.row_names[row_key], self.column_names[column_key], data)
-    def close(self):
-        self.workbook.close()
 
 
 

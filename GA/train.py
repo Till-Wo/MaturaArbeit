@@ -1,16 +1,19 @@
-import gym, csv
+import os
+
+import gym, csv, time
 import copy
 import numpy as np
 import torch
 import torch.nn as nn
-import TCF
 
+# Definition of Parameters
 MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
 N_PARENTS = 10
 GOAL_REWARD = 199
-ENV_NAME = "BipedalWalker-v3"
-IS_CONTINIOUS = True
+ENV_NAME = "CartPole-v1"
+IS_CONTINIOUS = False
+MAX_LENGTH_OF_EPISODE = 500
 
 
 class Network(nn.Module):
@@ -32,7 +35,7 @@ class Network(nn.Module):
 def fitness_function(env, nn, device):
     obs = env.reset()
     total_reward = 0.0
-    while True:
+    for i in range(MAX_LENGTH_OF_EPISODE):
         obs_v = torch.FloatTensor([obs]).to(device)
         act_prob = nn(obs_v)
         if IS_CONTINIOUS:
@@ -56,14 +59,17 @@ def mutate(nn):
     return child
 
 
-def main_loop(path="Data/"+ENV_NAME):
+def main_loop(save_path="Data/" + ENV_NAME + "/"):
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     device = torch.device("cpu")
-    with open(path + "-params.csv", "w") as csv_file:
+    with open(save_path + "params.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["MUTATION_STRENGTH", "POPULATION_SIZE", "N_PARENTS", "GOAL_REWARD"])
         writer.writerow([MUTATION_STRENGTH, POPULATION_SIZE, N_PARENTS, GOAL_REWARD])
 
-    Timer = TCF.TimeIt()
+    start_time = time.time()
 
     env = gym.make(ENV_NAME)
     gen_counter = 0
@@ -71,12 +77,13 @@ def main_loop(path="Data/"+ENV_NAME):
         population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]).to(device), 0] for _ in
                       range(POPULATION_SIZE)]
     else:
-        population = [[Network(env.observation_space.shape[0], env.action_space.n).to(device), 0] for _ in range(POPULATION_SIZE)]
+        population = [[Network(env.observation_space.shape[0], env.action_space.n).to(device), 0] for _ in
+                      range(POPULATION_SIZE)]
     for individual in population:
         individual[1] = fitness_function(env, individual[0], device)
 
     # ----------------Training Loop--------------------------------------------------------
-    with open(path + ".csv", "w") as csv_file:
+    with open(save_path + "log.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["reward_max", "reward_mean", "time"])
         while True:
@@ -85,14 +92,14 @@ def main_loop(path="Data/"+ENV_NAME):
 
             avg_reward = np.mean(rewards)
             max_reward = np.max(rewards)
-            writer.writerow([max_reward, avg_reward, Timer.update_and_reset()])
-            print(f"gen: {gen_counter} | max_reward: {max_reward} | avg_reward: {avg_reward}")
+            writer.writerow([max_reward, avg_reward, time.time() - start_time])
+            print(f"gen: {gen_counter} \t max_reward: {max_reward} \t avg_reward: {avg_reward}")
 
             if avg_reward > 199:
-                torch.save(population[-1][0], f"{path}.pth")
+                population.sort(key=lambda p: p[1], reverse=True)
+                torch.save(population[0][0], f"{save_path}net.pth")
                 break
 
-            # TODO Other algorithms
             prev_population = population
             population = [population[0]]
             for _ in range(POPULATION_SIZE - 1):

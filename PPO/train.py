@@ -1,49 +1,44 @@
-import time, csv, gym
+import time, csv, gym, os
 from PPO import PPO
 
-def train(save_path="Data/LunarLander-v2/BipedalWalker-v3"):
-    env_name = "BipedalWalker-v3"
+ENV_NAME = "CartPole-v1"
+has_continuous_action_space = False  # continuous action space; else discrete
+max_ep_len = 500  # max timesteps in one episode
+max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
 
-    has_continuous_action_space = True  # continuous action space; else discrete
+log_freq = max_ep_len * 2  # log avg reward in the interval (in num timesteps)
 
-    max_ep_len = 1000  # max timesteps in one episode
-    max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
+action_std = 0.6  # starting std for action distribution (Multivariate Normal)
+action_std_decay_rate = 0.05  # linearly decay action_std (action_std = action_std - action_std_decay_rate)
+min_action_std = 0.1  # minimum action_std (stop decay after action_std <= min_action_std)
+action_std_decay_freq = int(2.5e5)  # action_std decay frequency (in num timesteps)
 
-    log_freq = max_ep_len * 2  # log avg reward in the interval (in num timesteps)
+update_timestep = max_ep_len * 4  # update policy every n timesteps
+K_epochs = 80  # update policy for K epochs in one PPO update
 
-    action_std = 0.6  # starting std for action distribution (Multivariate Normal)
-    action_std_decay_rate = 0.05  # linearly decay action_std (action_std = action_std - action_std_decay_rate)
-    min_action_std = 0.1  # minimum action_std (stop decay after action_std <= min_action_std)
-    action_std_decay_freq = int(2.5e5)  # action_std decay frequency (in num timesteps)
+eps_clip = 0.2  # clip parameter for PPO
+gamma = 0.99  # discount factor
+
+lr_actor = 0.0003  # learning rate for actor network
+lr_critic = 0.001  # learning rate for critic network
 
 
 
-    update_timestep = max_ep_len * 4  # update policy every n timesteps
-    K_epochs = 80  # update policy for K epochs in one PPO update
 
-    eps_clip = 0.2  # clip parameter for PPO
-    gamma = 0.99  # discount factor
+def train(save_path="Data/"+ENV_NAME+"/"):
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
 
-    lr_actor = 0.0003  # learning rate for actor network
-    lr_critic = 0.001  # learning rate for critic network
-
-    env = gym.make(env_name)
-
-    # state space dimension
-    state_dim = env.observation_space.shape[0]
-
-    # action space dimension
-    if has_continuous_action_space:
-        action_dim = env.action_space.shape[0]
-    else:
-        action_dim = env.action_space.n
-
-    with open(save_path+"-params.csv", "w") as params_file:
+    with open(save_path+"params.csv", "w") as params_file:
         writer = csv.writer(params_file, delimiter="\t")
-        writer.writerow(["state_dim", "action_dim", "lr_actor", "lr_critic", "gamma", "K_epochs", "eps_clip", "has_continuous_action_space",
+        writer.writerow(["lr_actor", "lr_critic", "gamma", "K_epochs", "eps_clip", "has_continuous_action_space",
                     "action_std"])
-        writer.writerow([state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip, has_continuous_action_space,
+        writer.writerow([lr_actor, lr_critic, gamma, K_epochs, eps_clip, has_continuous_action_space,
                     action_std])
+
+    env = gym.make(ENV_NAME)
+    state_dim = env.observation_space.shape[0]
+    action_dim = env.action_space.shape[0] if has_continuous_action_space else env.action_space.n
 
     ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip, has_continuous_action_space,
                     action_std)
@@ -53,14 +48,12 @@ def train(save_path="Data/LunarLander-v2/BipedalWalker-v3"):
 
     log_running_reward = 0
     log_running_episodes = 0
-
     time_step = 0
     i_episode = 0
-
     avg_reward = 0
 
     # training loop
-    with open(save_path+".csv", "w") as csv_file:
+    with open(save_path+"log.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["time_step", "reward_avg", "time"])
         while time_step <= max_training_timesteps:
@@ -110,7 +103,7 @@ def train(save_path="Data/LunarLander-v2/BipedalWalker-v3"):
 
             i_episode += 1
             if avg_reward > 199:
-                ppo_agent.save(save_path+"-net")
+                ppo_agent.save(save_path+"net.pth")
                 break
         env.close()
 

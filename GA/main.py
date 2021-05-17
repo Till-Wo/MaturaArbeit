@@ -1,3 +1,3 @@
-import GYM_DESCRETE
+import train
 
-GYM_DESCRETE.main_loop()
+train.main_loop()

@@ -3,7 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/GA/Data/CartPole-v0.csv">
+        <entry key="/PPO/Data/BipedalWalker-v2/log.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/PPO/Data/BipedalWalker-v2/params.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/PPO/Data/BipedalWalker-v3.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />
@@ -18,27 +32,6 @@
           </value>
         </entry>
         <entry key="/PPO/Data/CartPole-v0.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/PPO/Data/LunarLander-v2/1-params.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/PPO/Data/LunarLander-v2/1.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="&#9;" />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/PPO/Data/LunarLanderContinuous-v2/1.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />

@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/PPO/Data/BipedalWalker-v2/TestIIII/log.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="&#9;" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/PPO/Data/BipedalWalker-v2/log.csv">
           <value>
             <Attribute>

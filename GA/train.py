@@ -11,9 +11,10 @@ MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
 N_PARENTS = 10
 GOAL_REWARD = 199
-ENV_NAME = "CartPole-v1"
+ENV_NAME = "BipedalWalker-v2"
 IS_CONTINIOUS = False
 MAX_LENGTH_OF_EPISODE = 500
+max_generation = 500
 
 
 class Network(nn.Module):
@@ -59,7 +60,7 @@ def mutate(nn):
     return child
 
 
-def main_loop(save_path="Data/" + ENV_NAME + "/"):
+def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
     save_path += "Test"
     while os.path.exists(save_path+"/"):
         save_path += "I"
@@ -98,7 +99,7 @@ def main_loop(save_path="Data/" + ENV_NAME + "/"):
             writer.writerow([max_reward, avg_reward, time.time() - start_time])
             print(f"gen: {gen_counter} \t max_reward: {max_reward} \t avg_reward: {avg_reward}")
 
-            if avg_reward > 199:
+            if avg_reward > 199 or gen_counter >= max_generation:
                 population.sort(key=lambda p: p[1], reverse=True)
                 torch.save(population[0][0], f"{save_path}net.pth")
                 break

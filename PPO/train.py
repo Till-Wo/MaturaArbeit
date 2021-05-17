@@ -1,9 +1,9 @@
 import time, csv, gym, os
-from PPO import PPO
+from PPO.PPO import PPO
 
-ENV_NAME = "CartPole-v1"
-has_continuous_action_space = False  # continuous action space; else discrete
-max_ep_len = 500  # max timesteps in one episode
+ENV_NAME = "BipedalWalker-v2"
+has_continuous_action_space = True  # continuous action space; else discrete
+max_ep_len = 1000  # max timesteps in one episode
 max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
 
 log_freq = max_ep_len * 2  # log avg reward in the interval (in num timesteps)
@@ -25,7 +25,7 @@ lr_critic = 0.001  # learning rate for critic network
 
 
 
-def train(save_path="Data/"+ENV_NAME+"/"):
+def train(save_path="PPO/Data/"+ENV_NAME+"/"):
     save_path += "Test"
     while os.path.exists(save_path+"/"):
         save_path += "I"
@@ -44,8 +44,7 @@ def train(save_path="Data/"+ENV_NAME+"/"):
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.shape[0] if has_continuous_action_space else env.action_space.n
 
-    ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip, has_continuous_action_space,
-                    action_std)
+    ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip, has_continuous_action_space, action_std)
 
     # track total training time
     start_time = time.time()
@@ -111,6 +110,9 @@ def train(save_path="Data/"+ENV_NAME+"/"):
                 break
         env.close()
 
+
+def go():
+    train()
 
 if __name__ == '__main__':
    for i in range(8):

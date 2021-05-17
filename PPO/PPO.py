@@ -4,11 +4,7 @@ from torch.distributions import MultivariateNormal
 from torch.distributions import Categorical
 
 
-################################## set device ##################################
-
-
 device = torch.device("cpu")
-print(f"Running on: {device.type}")
 
 
 class RolloutBuffer:
@@ -155,7 +151,6 @@ class PPO:
             print("--------------------------------------------------------------------------------------------")
 
     def decay_action_std(self, action_std_decay_rate, min_action_std):
-        print("--------------------------------------------------------------------------------------------")
 
         if self.has_continuous_action_space:
             self.action_std = self.action_std - action_std_decay_rate

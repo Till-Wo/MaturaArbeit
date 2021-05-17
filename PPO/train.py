@@ -1,21 +1,10 @@
-import os
-import glob
-import time
-import TCF
-import csv
-import torch
-import numpy as np
-
-import gym
-
-# import pybullet_envs
-
+import time, csv, gym
 from PPO import PPO
 
-def train(save_path="Data/CartPole-v0"):
-    env_name = "CartPole-v0"
+def train(save_path="Data/LunarLander-v2/BipedalWalker-v3"):
+    env_name = "BipedalWalker-v3"
 
-    has_continuous_action_space = False  # continuous action space; else discrete
+    has_continuous_action_space = True  # continuous action space; else discrete
 
     max_ep_len = 1000  # max timesteps in one episode
     max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
@@ -61,10 +50,6 @@ def train(save_path="Data/CartPole-v0"):
 
     # track total training time
     start_time = time.time()
-
-    # printing and logging variables
-    print_running_reward = 0
-    print_running_episodes = 0
 
     log_running_reward = 0
     log_running_episodes = 0
@@ -119,8 +104,6 @@ def train(save_path="Data/CartPole-v0"):
                 if done:
                     break
 
-            print_running_reward += current_ep_reward
-            print_running_episodes += 1
 
             log_running_reward += current_ep_reward
             log_running_episodes += 1

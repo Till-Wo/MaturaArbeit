@@ -9,8 +9,8 @@ MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
 N_PARENTS = 10
 GOAL_REWARD = 199
-ENV_NAME = "CartPole-v0"
-IS_CONTINIOUS = False
+ENV_NAME = "BipedalWalker-v3"
+IS_CONTINIOUS = True
 
 
 class Network(nn.Module):
@@ -56,7 +56,7 @@ def mutate(nn):
     return child
 
 
-def main_loop(path="Data/CartPole-v0"):
+def main_loop(path="Data/"+ENV_NAME):
     device = torch.device("cpu")
     with open(path + "-params.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")

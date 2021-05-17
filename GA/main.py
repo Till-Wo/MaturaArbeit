@@ -1,3 +1,3 @@
 import train
-
-train.main_loop()
+for i in range(10):
+    train.main_loop()

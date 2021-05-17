@@ -26,6 +26,10 @@ lr_critic = 0.001  # learning rate for critic network
 
 
 def train(save_path="Data/"+ENV_NAME+"/"):
+    save_path += "Test"
+    while os.path.exists(save_path+"/"):
+        save_path += "I"
+    save_path+="/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -109,4 +113,5 @@ def train(save_path="Data/"+ENV_NAME+"/"):
 
 
 if __name__ == '__main__':
-    train()
+   for i in range(8):
+        train()

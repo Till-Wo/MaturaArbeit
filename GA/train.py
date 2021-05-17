@@ -60,9 +60,12 @@ def mutate(nn):
 
 
 def main_loop(save_path="Data/" + ENV_NAME + "/"):
+    save_path += "Test"
+    while os.path.exists(save_path+"/"):
+        save_path += "I"
+    save_path+="/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-
     device = torch.device("cpu")
     with open(save_path + "params.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")

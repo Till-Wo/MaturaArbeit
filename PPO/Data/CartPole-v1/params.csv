@@ -1,0 +1,2 @@
+lr_actor	lr_critic	gamma	K_epochs	eps_clip	has_continuous_action_space	action_std
+0.0003	0.001	0.99	80	0.2	False	0.6

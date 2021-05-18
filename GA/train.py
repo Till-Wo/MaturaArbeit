@@ -96,10 +96,10 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
             max_reward = np.max(rewards)
             writer.writerow([max_reward, avg_reward, time.time() - start_time])
             print(f"gen: {gen_counter} \t max_reward: {max_reward} \t avg_reward: {avg_reward}")
+            population.sort(key=lambda p: p[1], reverse=True)
+            torch.save(population[0][0], f"{save_path}net.pth")
 
             if avg_reward > 199 or gen_counter >= max_generation:
-                population.sort(key=lambda p: p[1], reverse=True)
-                torch.save(population[0][0], f"{save_path}net.pth")
                 break
 
             prev_population = population

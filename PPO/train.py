@@ -103,8 +103,9 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
             log_running_episodes += 1
 
             i_episode += 1
+
+            ppo_agent.save(save_path + "net.pth")
             if avg_reward > 199:
-                ppo_agent.save(save_path+"net.pth")
                 break
         env.close()
 

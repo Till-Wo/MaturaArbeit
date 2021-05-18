@@ -116,9 +116,9 @@ def save_gif(env_name, path):
 
 if __name__ == '__main__':
     for i in range(10):
-        env_name = "CartPole-v1"
+        env_name = "BipedalWalker-v3"
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
-        has_continuous_action_space = False
+        has_continuous_action_space = True
         max_ep_len = 500           # max timesteps in one episode
         action_std = 0.5            # set same std for action distribution which was used while saving
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_std, path)

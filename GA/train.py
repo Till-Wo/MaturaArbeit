@@ -5,15 +5,13 @@ import copy
 import numpy as np
 import torch
 import torch.nn as nn
+from params import *
 
 # Definition of Parameters
 MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
 N_PARENTS = 10
 GOAL_REWARD = 199
-ENV_NAME = "BipedalWalker-v2"
-IS_CONTINIOUS = False
-MAX_LENGTH_OF_EPISODE = 500
 max_generation = 500
 
 
@@ -36,10 +34,10 @@ class Network(nn.Module):
 def fitness_function(env, nn, device):
     obs = env.reset()
     total_reward = 0.0
-    for i in range(MAX_LENGTH_OF_EPISODE):
+    for i in range(max_ep_len):
         obs_v = torch.FloatTensor([obs]).to(device)
         act_prob = nn(obs_v)
-        if IS_CONTINIOUS:
+        if has_continuous_action_space:
             action = torch.tanh(act_prob)
             action = action.cpu().detach().numpy()[0]
             action = action.clip(env.action_space.low[0], env.action_space.high[0])
@@ -77,7 +75,7 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
 
     env = gym.make(ENV_NAME)
     gen_counter = 0
-    if IS_CONTINIOUS:
+    if has_continuous_action_space:
         population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]).to(device), 0] for _ in
                       range(POPULATION_SIZE)]
     else:

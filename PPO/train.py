@@ -104,7 +104,10 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
 
             i_episode += 1
 
-            ppo_agent.save(save_path + "net.pth")
+            try:
+                ppo_agent.save(save_path + "net.pth")
+            except:
+                print("ERROR!!!!-NET COULD NOT BE SAVED")
             if avg_reward > 199:
                 break
         env.close()

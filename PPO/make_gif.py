@@ -119,8 +119,8 @@ if __name__ == '__main__':
         env_name = "BipedalWalker-v3"
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
         has_continuous_action_space = True
-        max_ep_len = 500           # max timesteps in one episode
-        action_std = 0.5            # set same std for action distribution which was used while saving
+        max_ep_len = 1000           # max timesteps in one episode
+        action_std = 0.4            # set same std for action distribution which was used while saving
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_std, path)
 
         save_gif(env_name, path)

@@ -1,6 +1,8 @@
 import time, csv, gym, os
 from PPO.PPO import PPO
-from params import *
+from parameters import *
+import numpy as np
+import pybulletgym
 
 max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
 
@@ -39,7 +41,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
                     action_std])
 
     env = gym.make(ENV_NAME)
-    state_dim = env.observation_space.shape[0]
+    state_dim = np.prod(list(env.observation_space.shape))
     action_dim = env.action_space.shape[0] if has_continuous_action_space else env.action_space.n
 
     ppo_agent = PPO(state_dim, action_dim, lr_actor, lr_critic, gamma, K_epochs, eps_clip, has_continuous_action_space, action_std)
@@ -64,7 +66,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
             for t in range(1, max_ep_len + 1):
 
                 # select action with policy
-                action = ppo_agent.select_action(state)
+                action = ppo_agent.select_action(state.flatten())
                 state, reward, done, _ = env.step(action)
 
                 # saving reward and is_terminals
@@ -108,7 +110,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
                 ppo_agent.save(save_path + "net.pth")
             except:
                 print("ERROR!!!!-NET COULD NOT BE SAVED")
-            if avg_reward > 199:
+            if avg_reward > 10000:
                 break
         env.close()
 

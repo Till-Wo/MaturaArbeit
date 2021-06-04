@@ -3,10 +3,11 @@ import glob
 from PIL import Image
 import torch
 import gym
-
-
+try:
+    import pybulletgym
+except:
+    print("pybullet can't be imported")
 device = torch.device("cpu")
-
 
 def save_gif_images(env_name, has_continuous_action_space, max_ep_len, path):
     print("============================================================================================")
@@ -19,8 +20,9 @@ def save_gif_images(env_name, has_continuous_action_space, max_ep_len, path):
     gif_images_dir = path+"gif_images"
     if not os.path.exists(gif_images_dir):
         os.makedirs(gif_images_dir)
-
+    print(path+"net.pth")
     nn = torch.load(path+"net.pth")
+    print(path+"net.pth", nn)
 
     print("--------------------------------------------------------------------------------------------")
 
@@ -29,6 +31,7 @@ def save_gif_images(env_name, has_continuous_action_space, max_ep_len, path):
     for ep in range(1, total_test_episodes + 1):
 
         ep_reward = 0
+        env.render()
         obs = env.reset()
 
         for t in range(1, max_ep_len + 1):
@@ -98,10 +101,10 @@ def save_gif(env_name, path):
 
 if __name__ == '__main__':
     for i in range(10):
-        env_name = "CartPole-v1"
+        env_name = "MountainCarContinuous-v0"
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
-        has_continuous_action_space = False
-        max_ep_len = 500  # max timesteps in one episode
+        has_continuous_action_space = True
+        max_ep_len = 300  # max timesteps in one episode
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, path)
 
         save_gif(env_name, path)

@@ -1,11 +1,15 @@
 import os
 import glob
 from PIL import Image
+import numpy as np
 
 import gym
 
 from PPO import PPO
-
+try:
+    import pybulletgym
+except:
+    pass
 
 def save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_std, path):
     print("============================================================================================")
@@ -22,7 +26,7 @@ def save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_st
     env = gym.make(env_name)
 
     # state space dimension
-    state_dim = env.observation_space.shape[0]
+    state_dim = np.prod(list(env.observation_space.shape))
 
     # action space dimension
     if has_continuous_action_space:
@@ -50,10 +54,11 @@ def save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_st
     for ep in range(1, total_test_episodes + 1):
 
         ep_reward = 0
+        env.render()
         state = env.reset()
 
         for t in range(1, max_ep_len + 1):
-            action = ppo_agent.select_action(state)
+            action = ppo_agent.select_action(state.flatten())
             state, reward, done, _ = env.step(action)
             ep_reward += reward
 
@@ -116,11 +121,11 @@ def save_gif(env_name, path):
 
 if __name__ == '__main__':
     for i in range(10):
-        env_name = "BipedalWalker-v3"
+        env_name = "MountainCarContinuous-v0"
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
         has_continuous_action_space = True
-        max_ep_len = 1000           # max timesteps in one episode
-        action_std = 0.4            # set same std for action distribution which was used while saving
+        max_ep_len = 15000           # max timesteps in one episode
+        action_std = 0.1           # set same std for action distribution which was used while saving
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_std, path)
 
         save_gif(env_name, path)

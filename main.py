@@ -1,7 +1,9 @@
 import GA.train
+"""
 import PPO.train
+import PPO.make_gif"""
 
 
 for i in range(1):
-    PPO.train.train()
+    GA.train.main_loop()
 

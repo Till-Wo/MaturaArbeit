@@ -1,6 +1,12 @@
+
 ENV_NAME = "CartPole-v1" #"BipedalWalker-v3"
 has_continuous_action_space = False
 max_ep_len = 500
+reward_bound = 200
+
+#  for GA
+
+
 
 
 """

@@ -1,6 +1,7 @@
 import os
 import glob
 from PIL import Image
+from parameters import *
 import torch
 import gym
 try:
@@ -103,8 +104,6 @@ if __name__ == '__main__':
     for i in range(10):
         env_name = "MountainCarContinuous-v0"
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
-        has_continuous_action_space = True
-        max_ep_len = 300  # max timesteps in one episode
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, path)
 
         save_gif(env_name, path)

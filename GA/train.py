@@ -36,11 +36,11 @@ class Network(nn.Module):
         return self.nn(x)
 
 
-def fitness_function(env, nn, device):
+def fitness_function(env, nn):
     obs = env.reset()
     total_reward = 0.0
     for i in range(max_ep_len):
-        obs_v = torch.FloatTensor([obs]).to(device)
+        obs_v = torch.FloatTensor([obs])
         act_prob = nn(obs_v)
         if has_continuous_action_space:
             action = torch.tanh(act_prob)
@@ -69,7 +69,6 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
     save_path+="/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    device = torch.device("cpu")
     with open(save_path + "params.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["MUTATION_STRENGTH", "POPULATION_SIZE", "N_PARENTS", "GOAL_REWARD"])
@@ -80,13 +79,13 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
     env = gym.make(ENV_NAME)
     gen_counter = 0
     if has_continuous_action_space:
-        population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]).to(device), 0] for _ in
+        population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]), 0] for _ in
                       range(POPULATION_SIZE)]
     else:
-        population = [[Network(env.observation_space.shape[0], env.action_space.n).to(device), 0] for _ in
+        population = [[Network(env.observation_space.shape[0], env.action_space.n), 0] for _ in
                       range(POPULATION_SIZE)]
     for individual in population:
-        individual[1] = fitness_function(env, individual[0], device)
+        individual[1] = fitness_function(env, individual[0])
 
     # ----------------Training Loop--------------------------------------------------------
     with open(save_path + "log.csv", "w") as csv_file:
@@ -107,7 +106,7 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
             except:
                 print("ERROR!!!!---NET COULD NOT BE SAVED")
 
-            if avg_reward > 199 or gen_counter >= max_generation:
+            if avg_reward > reward_bound or gen_counter >= max_generation:
                 break
 
             prev_population = population
@@ -121,7 +120,7 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
                         if random.getrandbits(1):
                             param.data = father_data[i]
                     child = mutate(child)
-                    fitness = fitness_function(env, child, device)
+                    fitness = fitness_function(env, child)
                     population.append((child, fitness))
 
             else:
@@ -130,6 +129,6 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
                 for _ in range(POPULATION_SIZE - 1):
                     parent = prev_population[parent_idx[_]][0]
                     child = mutate(parent)
-                    fitness = fitness_function(env, child, device)
+                    fitness = fitness_function(env, child)
                     population.append((child, fitness))
             gen_counter += 1

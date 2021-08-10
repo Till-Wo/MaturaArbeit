@@ -5,7 +5,6 @@ import numpy as np
 import pybulletgym
 
 max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
-
 log_freq = max_ep_len * 2  # log avg reward in the interval (in num timesteps)
 
 action_std = 0.6  # starting std for action distribution (Multivariate Normal)
@@ -110,7 +109,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
                 ppo_agent.save(save_path + "net.pth")
             except:
                 print("ERROR!!!!-NET COULD NOT BE SAVED")
-            if avg_reward > 10000:
+            if avg_reward > reward_bound:
                 break
         env.close()
 

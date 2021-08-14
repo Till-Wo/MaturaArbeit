@@ -1,8 +1,8 @@
 
-ENV_NAME = "CartPole-v1" #"BipedalWalker-v3"
+ENV_NAME = "Acrobot-v1"
 has_continuous_action_space = False
 max_ep_len = 500
-reward_bound = 200
+reward_bound = 1000
 
 #  for GA
 

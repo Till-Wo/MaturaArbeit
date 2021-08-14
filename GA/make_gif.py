@@ -4,10 +4,6 @@ from PIL import Image
 from parameters import *
 import torch
 import gym
-try:
-    import pybulletgym
-except:
-    print("pybullet can't be imported")
 device = torch.device("cpu")
 
 def save_gif_images(env_name, has_continuous_action_space, max_ep_len, path):
@@ -102,7 +98,7 @@ def save_gif(env_name, path):
 
 if __name__ == '__main__':
     for i in range(10):
-        env_name = "MountainCarContinuous-v0"
+        env_name = ENV_NAME
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, path)
 

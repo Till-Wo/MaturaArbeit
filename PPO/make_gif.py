@@ -2,14 +2,10 @@ import os
 import glob
 from PIL import Image
 import numpy as np
-
+from parameters import *
 import gym
 
 from PPO import PPO
-try:
-    import pybulletgym
-except:
-    pass
 
 def save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_std, path):
     print("============================================================================================")
@@ -121,10 +117,8 @@ def save_gif(env_name, path):
 
 if __name__ == '__main__':
     for i in range(10):
-        env_name = "MountainCarContinuous-v0"
+        env_name = ENV_NAME
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
-        has_continuous_action_space = True
-        max_ep_len = 15000           # max timesteps in one episode
         action_std = 0.1           # set same std for action distribution which was used while saving
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, action_std, path)
 

@@ -7,16 +7,15 @@ import copy
 import numpy as np
 import torch
 import torch.nn as nn
-import pybulletgym
 from parameters import *
 
 
 # Definition of Parameters
 MUTATION_STRENGTH = 0.02
 POPULATION_SIZE = 50
-N_PARENTS = 10
+N_PARENTS = 20
 GOAL_REWARD = 199
-max_generation = 500
+max_generation = 2000
 CROSSOVER = True
 
 
@@ -106,7 +105,7 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
             except:
                 print("ERROR!!!!---NET COULD NOT BE SAVED")
 
-            if avg_reward > reward_bound or gen_counter >= max_generation:
+            if avg_reward > reward_bound or gen_counter >= max_generation or time.time()-start_time>2*60:
                 break
 
             prev_population = population

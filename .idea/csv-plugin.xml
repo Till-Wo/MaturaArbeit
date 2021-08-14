@@ -3,28 +3,28 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/GA/Data/CartPole-v1/Test/log.csv">
+        <entry key="/GA/Data/BipedalWalker-v3/Test/log.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />
             </Attribute>
           </value>
         </entry>
-        <entry key="/GA/Data/CartPole-v1/Test/params.csv">
+        <entry key="/GA/Data/BipedalWalker-v3/TestI/log.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />
             </Attribute>
           </value>
         </entry>
-        <entry key="/GA/Data/CartPole-v1/TestI/log.csv">
+        <entry key="/GA/Data/BipedalWalker-v3/TestI/params.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />
             </Attribute>
           </value>
         </entry>
-        <entry key="/GA/Data/CartPole-v1/TestI/params.csv">
+        <entry key="/PPO/Data/BipedalWalker-v3/Test/log.csv">
           <value>
             <Attribute>
               <option name="separator" value="&#9;" />

@@ -2,15 +2,15 @@ import time, csv, gym, os
 from PPO.PPO import PPO
 from parameters import *
 import numpy as np
-import pybulletgym
 
-max_training_timesteps = int(3e6)  # break training loop if timeteps > max_training_timesteps
+
+max_training_timesteps = int(1e7)  # break training loop if timeteps > max_training_timesteps
 log_freq = max_ep_len * 2  # log avg reward in the interval (in num timesteps)
 
 action_std = 0.6  # starting std for action distribution (Multivariate Normal)
 action_std_decay_rate = 0.05  # linearly decay action_std (action_std = action_std - action_std_decay_rate)
 min_action_std = 0.1  # minimum action_std (stop decay after action_std <= min_action_std)
-action_std_decay_freq = int(2.5e5)  # action_std decay frequency (in num timesteps)
+action_std_decay_freq = int(2e5)  # action_std decay frequency (in num timesteps)
 
 update_timestep = max_ep_len * 4  # update policy every n timesteps
 K_epochs = 80  # update policy for K epochs in one PPO update
@@ -59,6 +59,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["time_step", "reward_avg", "time"])
         while time_step <= max_training_timesteps:
+
             state = env.reset()
             current_ep_reward = 0
 
@@ -109,7 +110,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
                 ppo_agent.save(save_path + "net.pth")
             except:
                 print("ERROR!!!!-NET COULD NOT BE SAVED")
-            if avg_reward > reward_bound:
+            if avg_reward > reward_bound or time.time()-start_time>2*60:
                 break
         env.close()
 

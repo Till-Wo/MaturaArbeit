@@ -1,8 +1,9 @@
 
-ENV_NAME = "Acrobot-v1"
+ENV_NAME = "LunarLander-v2"
 has_continuous_action_space = False
 max_ep_len = 500
 reward_bound = 1000
+time_length= 30
 
 #  for GA
 

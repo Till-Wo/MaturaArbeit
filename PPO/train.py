@@ -2,6 +2,7 @@ import time, csv, gym, os
 from PPO.PPO import PPO
 from parameters import *
 import numpy as np
+import platform, psutil
 
 
 max_training_timesteps = int(1e7)  # break training loop if timeteps > max_training_timesteps
@@ -53,6 +54,13 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
     time_step = 0
     i_episode = 0
     avg_reward = 0
+
+    memory = str(round(psutil.virtual_memory().total / (1024.0 ** 3))) + " GB"
+    uname = platform.uname()
+    cpufreq = psutil.cpu_freq()
+    with open(save_path + 'sysinfo.txt', 'w') as f:
+        f.write(
+            f"System: {uname.system}\nProcessor: {uname.processor}\nCurrent Frequency: {cpufreq.current:.2f}Mhz\nMemory: {memory}\nPercentage: {psutil.virtual_memory().percent}%")
 
     # training loop
     with open(save_path+"log.csv", "w") as csv_file:
@@ -110,7 +118,7 @@ def train(save_path="PPO/Data/"+ENV_NAME+"/"):
                 ppo_agent.save(save_path + "net.pth")
             except:
                 print("ERROR!!!!-NET COULD NOT BE SAVED")
-            if avg_reward > reward_bound or time.time()-start_time>2*60:
+            if avg_reward > reward_bound or time.time()-start_time>time_length*60:
                 break
         env.close()
 

@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from parameters import *
-
+import platform, psutil
 
 # Definition of Parameters
 MUTATION_STRENGTH = 0.02
@@ -68,6 +68,12 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
     save_path+="/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
+    memory = str(round(psutil.virtual_memory().total / (1024.0 ** 3))) + " GB"
+    uname = platform.uname()
+    cpufreq = psutil.cpu_freq()
+    with open(save_path + 'sysinfo.txt', 'w') as f:
+        f.write(
+            f"System: {uname.system}\nProcessor: {uname.processor}\nCurrent Frequency: {cpufreq.current:.2f}Mhz\nMemory: {memory}\nPercentage: {psutil.virtual_memory().percent}%")
     with open(save_path + "params.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["MUTATION_STRENGTH", "POPULATION_SIZE", "N_PARENTS", "GOAL_REWARD"])
@@ -105,7 +111,7 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
             except:
                 print("ERROR!!!!---NET COULD NOT BE SAVED")
 
-            if avg_reward > reward_bound or gen_counter >= max_generation or time.time()-start_time>2*60:
+            if avg_reward > reward_bound or gen_counter >= max_generation or time.time()-start_time>time_length*60:
                 break
 
             prev_population = population

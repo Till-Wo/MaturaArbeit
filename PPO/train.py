@@ -5,7 +5,7 @@ import numpy as np
 import platform, psutil
 
 
-max_training_timesteps = int(1e7)  # break training loop if timeteps > max_training_timesteps
+max_training_timesteps = int(8e8)  # break training loop if timeteps > max_training_timesteps
 log_freq = max_ep_len * 2  # log avg reward in the interval (in num timesteps)
 
 action_std = 0.6  # starting std for action distribution (Multivariate Normal)
@@ -13,8 +13,8 @@ action_std_decay_rate = 0.05  # linearly decay action_std (action_std = action_s
 min_action_std = 0.1  # minimum action_std (stop decay after action_std <= min_action_std)
 action_std_decay_freq = int(2e5)  # action_std decay frequency (in num timesteps)
 
-update_timestep = max_ep_len * 4  # update policy every n timesteps
-K_epochs = 80  # update policy for K epochs in one PPO update
+update_timestep = max_ep_len * 2  # update policy every n timesteps
+K_epochs = 10  # update policy for K epochs in one PPO update
 
 eps_clip = 0.2  # clip parameter for PPO
 gamma = 0.99  # discount factor

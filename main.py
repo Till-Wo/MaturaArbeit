@@ -9,6 +9,6 @@ def train_ppo():
 
 
 for i in range(10):
-    train_ga()
     train_ppo()
+    train_ga()
 

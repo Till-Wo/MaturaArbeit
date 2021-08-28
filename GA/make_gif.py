@@ -97,9 +97,12 @@ def save_gif(env_name, path):
     print("============================================================================================")
 
 if __name__ == '__main__':
-    for i in range(10):
+    for i in range(20):
         env_name = ENV_NAME
         path = "Data/" + env_name + "/Test" + "I"*i + "/"
+        gif_images_dir = path + "net.pth"
+        if not os.path.exists(gif_images_dir):
+            continue
         save_gif_images(env_name, has_continuous_action_space, max_ep_len, path)
 
         save_gif(env_name, path)

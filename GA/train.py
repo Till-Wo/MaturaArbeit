@@ -1,6 +1,5 @@
 import os
 import random
-
 from scipy.special import softmax
 import gym, csv, time
 import copy
@@ -12,8 +11,7 @@ import platform, psutil
 
 # Definition of Parameters
 MUTATION_STRENGTH = 0.02
-POPULATION_SIZE = 50
-N_PARENTS = 20
+POPULATION_SIZE = 20
 GOAL_REWARD = 199
 max_generation = 2000
 CROSSOVER = True
@@ -54,6 +52,7 @@ def fitness_function(env, nn):
             break
     return total_reward
 
+
 def mutate(nn):
     child = copy.deepcopy(nn)
     for param in child.parameters():
@@ -62,10 +61,11 @@ def mutate(nn):
 
 
 def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
+    # ---------------------Logging------------------------------------------
     save_path += "Test"
-    while os.path.exists(save_path+"/"):
+    while os.path.exists(save_path + "/"):
         save_path += "I"
-    save_path+="/"
+    save_path += "/"
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     memory = str(round(psutil.virtual_memory().total / (1024.0 ** 3))) + " GB"
@@ -73,19 +73,19 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
     cpufreq = psutil.cpu_freq()
     with open(save_path + 'sysinfo.txt', 'w') as f:
         f.write(
-            f"System: {uname.system}\nProcessor: {uname.processor}\nCurrent Frequency: {cpufreq.current:.2f}Mhz\nMemory: {memory}\nPercentage: {psutil.virtual_memory().percent}%")
+            f"System: {uname.system}\nProcessor: {uname.processor}\nCurrent Frequency: {cpufreq.current:.2f}Mhz" +
+            f"\nMemory: {memory}\nPercentage: {psutil.virtual_memory().percent}%")
     with open(save_path + "params.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
-        writer.writerow(["MUTATION_STRENGTH", "POPULATION_SIZE", "N_PARENTS", "GOAL_REWARD"])
-        writer.writerow([MUTATION_STRENGTH, POPULATION_SIZE, N_PARENTS, GOAL_REWARD])
+        writer.writerow(["MUTATION_STRENGTH", "POPULATION_SIZE", "GOAL_REWARD"])
+        writer.writerow([MUTATION_STRENGTH, POPULATION_SIZE, GOAL_REWARD])
 
     start_time = time.time()
-
+    # =================================================================================
     env = gym.make(ENV_NAME)
     gen_counter = 0
     if has_continuous_action_space:
-        population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]), 0] for _ in
-                      range(POPULATION_SIZE)]
+        population = [[Network(env.observation_space.shape[0], env.action_space.shape[0]), 0] for _ in range(POPULATION_SIZE)]
     else:
         population = [[Network(env.observation_space.shape[0], env.action_space.n), 0] for _ in
                       range(POPULATION_SIZE)]
@@ -96,31 +96,17 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
     with open(save_path + "log.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter="\t")
         writer.writerow(["reward_max", "reward_mean", "time"])
+        population.sort(key=lambda p: p[1], reverse=True)
         while True:
-            population.sort(key=lambda p: p[1], reverse=True)
-            rewards = [p[1] for p in population[:N_PARENTS]]
-
-            avg_reward = np.mean(rewards)
-            max_reward = np.max(rewards)
-            writer.writerow([max_reward, avg_reward, time.time() - start_time])
-            print(f"gen: {gen_counter} \t max_reward: {max_reward} \t avg_reward: {avg_reward}")
-
-            try:
-                population.sort(key=lambda p: p[1], reverse=True)
-                torch.save(population[0][0], f"{save_path}net.pth")
-            except:
-                print("ERROR!!!!---NET COULD NOT BE SAVED")
-
-            if avg_reward > reward_bound or gen_counter >= max_generation or time.time()-start_time>time_length*60:
-                break
-
             prev_population = population
             population = [population[0]]
+
             if CROSSOVER:
-                parent_idx = np.random.choice(range(len(prev_population)), (POPULATION_SIZE - 1)*2, p=softmax([indiv[1] for indiv in prev_population]))
+                parent_idx = np.random.choice(range(len(prev_population)), (POPULATION_SIZE - 1) * 2,
+                                              p=softmax([indiv[1] for indiv in prev_population]))
                 for i in range(POPULATION_SIZE - 1):
-                    child = copy.deepcopy(prev_population[parent_idx[i*2]][0])
-                    father_data = [param.data for param in prev_population[parent_idx[i*2+1]][0].parameters()]
+                    child = copy.deepcopy(prev_population[parent_idx[i * 2]][0])
+                    father_data = [param.data for param in prev_population[parent_idx[i * 2 + 1]][0].parameters()]
                     for i, param in enumerate(child.parameters()):
                         if random.getrandbits(1):
                             param.data = father_data[i]
@@ -136,4 +122,20 @@ def main_loop(save_path="GA/Data/" + ENV_NAME + "/"):
                     child = mutate(parent)
                     fitness = fitness_function(env, child)
                     population.append((child, fitness))
+
+            # ====================Logging=============================
+            rewards = [p[1] for p in population]
+            avg_reward = np.mean(rewards)
+            max_reward = np.max(rewards)
+            writer.writerow([max_reward, avg_reward, time.time() - start_time])
+            print(f"gen: {gen_counter} \t max_reward: {max_reward} \t avg_reward: {avg_reward}")
+            population.sort(key=lambda p: p[1], reverse=True)
+            try:
+                    torch.save(population[0][0], f"{save_path}net.pth")
+            except:
+                print("ERROR!!!!---NET COULD NOT BE SAVED")
+            # =====================================================================
+
+            if avg_reward > reward_bound or gen_counter >= max_generation or time.time() - start_time > time_length * 60:
+                break
             gen_counter += 1

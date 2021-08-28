@@ -1,0 +1,5 @@
+System: Darwin
+Processor: i386
+Current Frequency: 2700.00Mhz
+Memory: 16 GB
+Percentage: 40.6%

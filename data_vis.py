@@ -55,7 +55,7 @@ if __name__ == '__main__':
             for i in range(10):
                 y = datay[i]
                 x = datax[i]
-                yhat = moving_avg(y, 5)
+                yhat = moving_avg(y, 1)
                 plt.plot(x[-len(yhat):], yhat)
             plt.xlabel('Zeit in Minuten')
             plt.ylabel('Reward')

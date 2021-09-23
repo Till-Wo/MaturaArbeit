@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 from scipy.signal import savgol_filter
 import os
-import pandas
 import random
 
 
@@ -46,17 +45,29 @@ def get_data(ENV_NAME):
     return [list_time, list_rewards]
 
 if __name__ == '__main__':
-    for Algorithm in ["GA", "PPO"]:
+    for Algorithm in ["GA"]:
         subfolders = [f.path for f in os.scandir(f"{Algorithm}\\Data") if f.is_dir()]
         print(subfolders)
         for subfolder in subfolders:
-
             datax, datay = get_data(subfolder)
+            len_shortest_episode = len(min(datax, key=lambda x: len(x)))
+            average_time = [[] for i in range(len_shortest_episode)]
+            average_data = [[] for i in range(len_shortest_episode)]
             for i in range(10):
                 y = datay[i]
                 x = datax[i]
-                yhat = moving_avg(y, 1)
-                plt.plot(x[-len(yhat):], yhat)
+                plt.plot(x[-len(y):], y, alpha = 0.3)
+                for j in range(len(x)-len_shortest_episode):
+                    x.pop(random.randint(1,len(x)-2))
+                    y.pop(random.randint(1,len(y)-2))
+                for k in range(len(x)):
+                    average_time[k].append(x[k])
+                    average_data[k].append(y[k])
+
+            print(average_time)
+            average_time = [sum(i)/len(i) for i in average_time]
+            average_data = [sum(i)/len(i) for i in average_data]
+            plt.plot(average_time, average_data)
             plt.xlabel('Zeit in Minuten')
             plt.ylabel('Reward')
             if Algorithm == "GA":

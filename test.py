@@ -1,37 +1,65 @@
-import gym, time
-import pybulletgym
+import csv
+import matplotlib.pyplot as plt
+import matplotlib
+from scipy.signal import savgol_filter
+import os
 
 
-env = gym.make("AtlasPyBulletEnv-v0")
-env.render()
-env.reset()
-for i in range(5000):
-    env.step(env.action_space.sample())
-time.sleep(2)
-env.close()
 
 
-"""
-MountainCarContinuous-v0
-BipedalWalker-v3
-CartPole-v1
-
-RoboSchool Envs			
-InvertedPendulumPyBulletEnv-v0
-InvertedDoublePendulumPyBulletEnv-v0	
-InvertedPendulumSwingupPyBulletEnv-v0	
-ReacherPyBulletEnv-v0	
-Walker2DPyBulletEnv-v0
-HalfCheetahPyBulletEnv-v0
-AntPyBulletEnv-v0
-HopperPyBulletEnv-v0
-HumanoidPyBulletEnv-v0
-HumanoidFlagrunPyBulletEnv-v0	
-HumanoidFlagrunHarderPyBulletEnv-v0	
-AtlasPyBulletEnv-v0
-PusherPyBulletEnv-v0
-ThrowerPyBulletEnv-v0
-StrikerPyBulletEnv-v0
+def moving_avg(data, window_size):
+    i = 0
+    moving_averages = []
+    while i < len(data) - window_size + 1:
+        this_window = data[i: i + window_size]
+        window_average = sum(this_window) / window_size
+        moving_averages.append(window_average)
+        i += 1
 
 
-"""
+    return moving_averages
+
+
+def get_data(ENV_NAME):
+    list_rewards = list()
+    list_time = list()
+    for i in range(10):
+        list_rewards.append([])
+        list_time.append([])
+        path = ENV_NAME + "\\Test" + "I"*i + "\\"
+        with open(path + "log.csv") as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter='\t')
+            line_count = 0
+            for row in csv_reader:
+                if line_count == 0:
+                    line_count += 1
+                else:
+                    if line_count % 4 == 0:
+                        if Algorithm=="GA":
+                            list_rewards[i].append(float(row[0])) # Max Average
+                        else:
+                            list_rewards[i].append(float(row[1]))
+                        list_time[i].append(float(row[2])/60)
+                    line_count += 1
+    return [list_time, list_rewards]
+
+if __name__ == '__main__':
+    print(f"Name der Umgebung\tBestes wÃ¤hrend dem Testen erreichtes Ergebnis\tBestes Endergebnis\tDurchschnittliches Endergebnis")
+    rst = list()
+    for Algorithm in ["PPO"]:
+        subfolders = [f.path for f in os.scandir(f"{Algorithm}\\Data") if f.is_dir()]
+        for subfolder in subfolders:
+
+            datax, datay = get_data(subfolder)
+            if Algorithm == "GA":
+                name = (Algorithm+" "+subfolder[8:-3])
+            else:
+                name = (Algorithm+" "+subfolder[9:-3])
+            flat_list = [item for sublist in datay for item in sublist]
+            average = sum(i[-1] for i in datay)/len(datay)
+            bestes_endereb = max(i[-1] for i in datay)
+
+            rst.append(f"{name}\t{max(flat_list)}\t{bestes_endereb}\t{average}")
+
+    for i in range(len(rst)):
+        print(rst[i])

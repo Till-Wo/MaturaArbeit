@@ -45,7 +45,7 @@ def get_data(ENV_NAME):
     return [list_time, list_rewards]
 
 if __name__ == '__main__':
-    for Algorithm in ["GA"]:
+    for Algorithm in ["GA", "PPO"]:
         subfolders = [f.path for f in os.scandir(f"{Algorithm}\\Data") if f.is_dir()]
         print(subfolders)
         for subfolder in subfolders:
@@ -67,7 +67,8 @@ if __name__ == '__main__':
             print(average_time)
             average_time = [sum(i)/len(i) for i in average_time]
             average_data = [sum(i)/len(i) for i in average_data]
-            plt.plot(average_time, average_data)
+            yamah = moving_avg(average_data, 4)
+            plt.plot(average_time[3:], yamah)
             plt.xlabel('Zeit in Minuten')
             plt.ylabel('Reward')
             if Algorithm == "GA":

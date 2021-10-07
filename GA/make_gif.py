@@ -28,8 +28,8 @@ def save_gif_images(env_name, has_continuous_action_space, max_ep_len, path):
     for ep in range(1, total_test_episodes + 1):
 
         ep_reward = 0
-        env.render()
         obs = env.reset()
+        env.render()
 
         for t in range(1, max_ep_len + 1):
             obs_v = torch.FloatTensor([obs]).to(device)

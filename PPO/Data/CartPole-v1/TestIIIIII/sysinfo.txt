@@ -1,5 +1,5 @@
-System: Darwin
-Processor: i386
-Current Frequency: 2700.00Mhz
-Memory: 16 GB
-Percentage: 34.7%
+System: Windows
+Processor: Intel64 Family 6 Model 94 Stepping 3, GenuineIntel
+Current Frequency: 3408.00Mhz
+Memory: 12 GB
+Percentage: 40.6%

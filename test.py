@@ -1,7 +1,7 @@
+"""
+This file contains code used to print out information about the collected information of the runs
+"""
 import csv
-import matplotlib.pyplot as plt
-import matplotlib
-from scipy.signal import savgol_filter
 import os
 
 
@@ -15,8 +15,6 @@ def moving_avg(data, window_size):
         window_average = sum(this_window) / window_size
         moving_averages.append(window_average)
         i += 1
-
-
     return moving_averages
 
 
@@ -42,6 +40,7 @@ def get_data(ENV_NAME):
                         list_time[i].append(float(row[2])/60)
                     line_count += 1
     return [list_time, list_rewards]
+
 
 if __name__ == '__main__':
     print(f"Name der Umgebung\tBestes wÃ¤hrend dem Testen erreichtes Ergebnis\tBestes Endergebnis\tDurchschnittliches Endergebnis")

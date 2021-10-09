@@ -1,3 +1,6 @@
+"""
+This file contains the code used to train the GA algorithm and the algorithm itself
+"""
 import os
 import random
 from scipy.special import softmax

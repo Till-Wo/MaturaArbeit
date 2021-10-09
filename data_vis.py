@@ -1,7 +1,9 @@
+"""
+This file contains code - used to create the graphs showing the training
+"""
+
 import csv
 import matplotlib.pyplot as plt
-import matplotlib
-from scipy.signal import savgol_filter
 import os
 import random
 
@@ -16,8 +18,6 @@ def moving_avg(data, window_size):
         window_average = sum(this_window) / window_size
         moving_averages.append(window_average)
         i += 1
-
-
     return moving_averages
 
 
@@ -43,6 +43,7 @@ def get_data(ENV_NAME):
                         list_time[i].append(float(row[2])/60)
                     line_count += 1
     return [list_time, list_rewards]
+
 
 if __name__ == '__main__':
     for Algorithm in ["GA", "PPO"]:
@@ -77,5 +78,4 @@ if __name__ == '__main__':
             else:
                 plt.title(Algorithm+" "+subfolder[9:-3])
                 plt.savefig("Pics/"+Algorithm+"_"+subfolder[9:])
-
             plt.clf()

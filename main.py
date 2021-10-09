@@ -1,4 +1,6 @@
-
+"""
+This file manages the training
+"""
 def train_ga():
     import GA.train
     GA.train.main_loop()

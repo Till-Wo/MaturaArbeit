@@ -1,5 +1,0 @@
-System: Windows
-Processor: Intel64 Family 6 Model 94 Stepping 3, GenuineIntel
-Current Frequency: 3408.00Mhz
-Memory: 12 GB
-Percentage: 45.7%
